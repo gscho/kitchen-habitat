@@ -25,3 +25,9 @@ tmp
 .yardoc
 _yardoc
 doc/
+
+# Kitchen
+.kitchen
+
+# Habitat
+results/
