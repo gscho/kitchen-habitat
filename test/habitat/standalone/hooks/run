@@ -1,0 +1,13 @@
+#!/bin/bash
+
+exec 2>&1
+
+{{#eachAlive bind.test.members as |member| ~}}
+  echo "Bound to {{member.sys.hostname}}"
+{{/eachAlive ~}}]
+
+while true
+do
+  echo "Standalone {{sys.hostname}} is sleeping"
+  sleep 5
+done
