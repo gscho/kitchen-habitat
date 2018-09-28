@@ -30,6 +30,7 @@ EOF
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec",     "~> 3.2"
   s.add_development_dependency "simplecov", "~> 0.9"
+  s.add_development_dependency "kitchen-docker", "~> 2.7"
 
   # style and complexity libraries are tightly version pinned as newer releases
   # may introduce new and undesireable style choices which would be immediately
