@@ -1,0 +1,71 @@
+driver:
+  name: docker
+  binary: /usr/local/bin/docker
+  use_sudo: false
+
+provisioner:
+  name: habitat
+
+verifier:
+  name: inspec
+  format: documentation
+
+platforms:
+  - name: centos-7.2
+
+suites:
+  - name: leader_1
+    provisioner:
+      artifact_name: <%= ENV['HAB_ARTIFACT_NAME'] || ::File.read('./test/habitat/leader/results/last_build.env').split("\n").select { |s| s.include?('pkg_artifact') }.first.split('=').last %>
+      results_directory: ./test/habitat/leader/results
+      service_update_strategy: rolling
+      service_topology: leader
+    driver:
+      instance_name: leader_1
+    verifier:
+      inspec_tests:
+        - path: test/inspec/kitchen-habitat/leader.rb
+  - name: leader_2
+    provisioner:
+      artifact_name: <%= ENV['HAB_ARTIFACT_NAME'] || ::File.read('./test/habitat/leader/results/last_build.env').split("\n").select { |s| s.include?('pkg_artifact') }.first.split('=').last %>
+      results_directory: ./test/habitat/leader/results
+      service_update_strategy: rolling
+      service_topology: leader
+      hab_sup_peer:
+        - leader_1
+    driver:
+      instance_name: leader_2
+      links: "leader_1:leader_1"
+    verifier:
+      inspec_tests:
+        - path: test/inspec/kitchen-habitat/leader.rb
+  - name: leader_3
+    provisioner:
+      artifact_name: <%= ENV['HAB_ARTIFACT_NAME'] || ::File.read('./test/habitat/leader/results/last_build.env').split("\n").select { |s| s.include?('pkg_artifact') }.first.split('=').last %>
+      results_directory: ./test/habitat/leader/results
+      service_update_strategy: rolling
+      service_topology: leader
+      hab_sup_peer:
+        - leader_1
+    driver:
+      instance_name: leader_3
+      links: "leader_1:leader_1"
+    verifier:
+      inspec_tests:
+        - path: test/inspec/kitchen-habitat/leader.rb
+  - name: standalone
+    provisioner:
+      service_update_strategy: at-once
+      service_topology: standalone
+      artifact_name: <%= ENV['HAB_ARTIFACT_NAME'] || ::File.read('./test/habitat/standalone/results/last_build.env').split("\n").select { |s| s.include?('pkg_artifact') }.first.split('=').last %>
+      results_directory: ./test/habitat/standalone/results
+      hab_sup_bind:
+        - test:leader.default
+      hab_sup_peer:
+        - leader_1
+    driver:
+      instance_name: standalone
+      links: "leader_1:leader_1"
+    verifier:
+      inspec_tests:
+        - path: test/inspec/kitchen-habitat/standalone.rb
